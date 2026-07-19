@@ -8,8 +8,10 @@ Importable:
 """
 
 import json
+import os
 import pprint
 import shlex
+import shutil
 import time
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -17,8 +19,31 @@ from urllib.parse import urlsplit
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-CHROMIUM = "/usr/bin/chromium"
 BASE = Path(__file__).resolve().parent
+
+
+def _encontrar_navegador():
+    """Detecta Chrome o Chromium en cualquier maquina (Linux/Mac/Win)."""
+    env = os.environ.get("CAPTURADOR_BROWSER")   # override manual si hace falta
+    if env and Path(env).exists():
+        return env
+    # buscar en el PATH
+    for nombre in ("chromium", "chromium-browser", "google-chrome",
+                   "google-chrome-stable", "chrome"):
+        ruta = shutil.which(nombre)
+        if ruta:
+            return ruta
+    # rutas comunes por si no esta en el PATH
+    comunes = [
+        "/usr/bin/chromium", "/usr/bin/chromium-browser",
+        "/usr/bin/google-chrome", "/usr/bin/google-chrome-stable", "/snap/bin/chromium",
+        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+    ]
+    for r in comunes:
+        if Path(r).exists():
+            return r
+    return None   # None -> Selenium usa el Chrome por defecto del sistema
 
 # Gancho JS que se inyecta antes de cada pagina: envuelve XHR y fetch para
 # registrar metodo, url, headers, body, status y respuesta de cada peticion.
@@ -62,7 +87,9 @@ HOOK = r"""
 
 def nuevo_driver(headless=False, perfil=None):
     o = Options()
-    o.binary_location = CHROMIUM
+    navegador = _encontrar_navegador()
+    if navegador:
+        o.binary_location = navegador   # si es None, Selenium usa el Chrome por defecto
     if headless:
         o.add_argument("--headless=new")
         o.add_argument("--no-sandbox")

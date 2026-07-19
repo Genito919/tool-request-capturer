@@ -18,7 +18,8 @@ Muchas tareas repetitivas en sistemas web siguen el mismo patrón: entrar a un m
 ```bash
 pip install -r requirements.txt
 ```
-Requiere Chromium (`/usr/bin/chromium`). Selenium descarga el driver automáticamente.
+Requiere **Chrome o Chromium** (los detecta automáticamente). Selenium descarga el driver solo.
+Si tienes el navegador en una ruta rara, puedes indicarla con la variable `CAPTURADOR_BROWSER`.
 
 ## Uso
 
