@@ -1,0 +1,16 @@
+# datos de captura (contienen cookies/tokens — nunca subir)
+capturas.json
+*.json
+!package.json
+
+# resultados/datos generados
+*.xlsx
+*.csv
+pdfs/
+
+# perfil del navegador
+perfil_chrome/
+
+# python
+__pycache__/
+*.pyc
